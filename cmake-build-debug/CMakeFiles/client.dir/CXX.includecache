@@ -1,0 +1,24 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+C:/Users/Abdelrahman Nour/CLionProjects/client/main.cpp
+cstdio
+-
+cstdlib
+-
+cstring
+-
+winsock.h
+-
+iostream
+-
+fstream
+-
+bits/stdc++.h
+-
+

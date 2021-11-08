@@ -80,6 +80,9 @@
 				</MakeCommands>
 			</Target>
 		</Build>
+		<Unit filename="C:/Users/Abdelrahman Nour/CLionProjects/client/http_parser.h">
+			<Option target="client"/>
+		</Unit>
 		<Unit filename="C:/Users/Abdelrahman Nour/CLionProjects/client/main.cpp">
 			<Option target="client"/>
 		</Unit>

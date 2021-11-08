@@ -6,6 +6,22 @@
 
 #IncludeRegexTransform: 
 
+C:/Users/Abdelrahman Nour/CLionProjects/client/http_parser.h
+cstdio
+-
+cstdlib
+-
+cstring
+-
+winsock.h
+-
+iostream
+-
+fstream
+-
+bits/stdc++.h
+-
+
 C:/Users/Abdelrahman Nour/CLionProjects/client/main.cpp
 cstdio
 -
@@ -21,4 +37,6 @@ fstream
 -
 bits/stdc++.h
 -
+http_parser.h
+C:/Users/Abdelrahman Nour/CLionProjects/client/http_parser.h
 

@@ -117,16 +117,17 @@ void parse_http(char *message ,
     }
     int k = 0 ;
     char msg[end_of_headers+1];
-    while(k!=end_of_headers){
+    while(k!=end_of_headers+1){
         msg[k] = message[k];
         k++;
     }
     msg[k]='\0';
     int j = i+4;
-    while(message[j] != '\0' ){
-        body+=message[j];
-        j++;
-    }
+//    int j = i+4;
+//    while(message[j] != '\0' ){
+//        body+=message[j];
+//        j++;
+//    }
     vector<char *> lines = get_lines(msg);
     vector<char *> words = get_words(lines[0]);
 
@@ -143,6 +144,14 @@ void parse_http(char *message ,
             word = strtok(NULL, ": ");
         }
         headers[words[0]] = words[1];
+    }
+    int cnt = ( headers.find("Content-Length") == headers.end() )? 0 : stoi(headers["Content-Length"]);
+    //cout<<headers["Content-Length"]<<" content length\n";
+    int y = 0;
+    while(y<cnt){
+        body+=message[j];
+        j++;
+        y++;
     }
 
 

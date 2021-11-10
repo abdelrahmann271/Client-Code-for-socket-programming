@@ -6,6 +6,10 @@
 
 #IncludeRegexTransform: 
 
+C:/Users/Abdelrahman Nour/CLionProjects/client/file_parser.h
+bits/stdc++.h
+-
+
 C:/Users/Abdelrahman Nour/CLionProjects/client/http_parser.h
 cstdio
 -
@@ -39,4 +43,6 @@ bits/stdc++.h
 -
 http_parser.h
 C:/Users/Abdelrahman Nour/CLionProjects/client/http_parser.h
+file_parser.h
+C:/Users/Abdelrahman Nour/CLionProjects/client/file_parser.h
 

@@ -15,9 +15,10 @@ using namespace std;
 #define DEFAULT_BUFLEN 9000
 
 //cout<<"==>"<<<<"\n";
-string DIR = "/test1";
+
 int main() {
 
+    //Initialization
 
     WSAData wsaData;
     if (WSAStartup(MAKEWORD(1, 1), &wsaData) != 0) {
@@ -25,8 +26,8 @@ int main() {
         exit(1);
     }
     cout<<"==>"<<"WSAStartup Success"<<"\n";
-    //Get Socket.
 
+    //Get Socket.
 
     int sockfd;
     struct sockaddr_in dest_addr; // will hold the destination addr
@@ -40,18 +41,8 @@ int main() {
     //Read from File
 
     vector<vector<string>> commands = parse_input_file("input.txt");
-//    cout<<commands.size()<<"\n";
-//    for(int i = 0 ; i < commands.size() ; i++){
-//        cout<<i<<" ";
-//        cout<<commands[i][0]<<" ";
-//        cout<<commands[i][1]<<" ";
-//        cout<<commands[i][2]<<" ";
-//        cout<<commands[i][3]<<" ";
-//        cout<<"\n";
-//    }
 
-    //then execute commands..
-    //For Every Command do the following ..
+
 
     dest_addr.sin_family = AF_INET; // host byte order
     dest_addr.sin_port = htons(DEST_PORT); // short, network byte order
@@ -67,11 +58,15 @@ int main() {
     cout<<"==>"<<"Client is connected to Server"<<"\n";
 
 
+    //Executing commands..
 
     //For every command do the following ..
     for(int i = 0 ; i < commands.size() ; i++){
+        cout<<"========================================================================================\n";
         string method = commands[i][0];
+
         string file_name = commands[i][1];
+
 
         HTTP request;
         string body;
@@ -81,6 +76,7 @@ int main() {
             request.set_method("GET");
             request.set_filename(file_name);
             string whole_request = request.build();
+
 
             //Get the file name with extension to write it.
             int lstInd;
@@ -100,11 +96,13 @@ int main() {
             for( ; i < whole_request.size(); i++){  // handle this
                 msg[i] = whole_request[i];
             }
+
             int len, bytes_sent;
             len = strlen(msg);
-            cout<<"\nlen"<<i<<"\n";
+            cout<<"len"<<i<<"\n";
             int recvbuflen = DEFAULT_BUFLEN;
             char recvbuf[DEFAULT_BUFLEN];
+
             int iResult;
             // Send an initial buffer
             iResult = send(sockfd, msg, (int) strlen(msg), 0);
@@ -117,41 +115,49 @@ int main() {
             printf("Bytes Sent: %ld\n", iResult);
 
             cout<<"==>"<<"message is sent to Server"<<"\n";
-            //Receive Message
+
+            //Receive message
+
             char buf[DEFAULT_BUFLEN]={0};
             int bytesReceived = recv(sockfd, buf, DEFAULT_BUFLEN, 0);
+            cout<<bytesReceived;
+
             if (bytesReceived > 0)
             {
                 cout<<"==>"<<"The messgage"<<"\n";
                 for(int i = 0 ; i < bytesReceived ; i++){
                     cout<<buf[i];
                 }
+
                 unordered_map<string,string> headers;
                 string http_version;
                 string body;
                 string status_code;
                 parse_http(buf, headers,http_version,status_code,body,size_of_message(buf));
+
                 ofstream MyFile;
-                string createFile = file;
+                string createFile = "/Users/Abdelrahman Nour/CLionProjects/client/" + file;
+
                 cout<<"\n"<<createFile<<"\n";
                 MyFile.open(createFile.c_str(), std::ofstream::binary | std::ofstream::out);
                 if(!MyFile){
                     cout<<"error file\n";
+                    //Create the file..
                 }
                 else{
                     cout<<body.size();
                     MyFile << body;
-                    cout << "==>" << "File posted Succesully\n";
                     // Close the file
                     MyFile.close();
                     cout<<"==>"<<"Response Received Successfully"<<"\n";
                 }
-
             }
         }
         else if(method == "client-post"){
-            //string file_to_post =  file_name; // From Command
-            string file_to_post =  "yoyo.jpg"; // From Command
+
+            string file_to_post = "/Users/Abdelrahman Nour/CLionProjects/client/" + file_name; // From Command
+            cout<<file_name<<"\n";
+            //string file_to_post =  "yoyo.jpg"; // From Command
             char buffer_of_file[DEFAULT_BUFLEN]; /// tooooooooooooooooooooooooooooo
             std::ifstream input;
             input.open(file_to_post,ios::in | ios::binary);
@@ -205,6 +211,22 @@ int main() {
                     return 1;
                 }
                 printf("Bytes Sent: %ld\n", iResult);
+
+                char buf[DEFAULT_BUFLEN]={0};
+                int bytesReceived = recv(sockfd, buf, DEFAULT_BUFLEN, 0);
+                if (bytesReceived > 0)
+                {
+                    cout<<"==>"<<"The messgage"<<"\n";
+                    for(int i = 0 ; i < bytesReceived ; i++){
+                        cout<<buf[i];
+                    }
+//                    unordered_map<string,string> headers;
+//                    string http_version;
+//                    string body;
+//                    string status_code;
+//                    parse_http(buf, headers,http_version,status_code,body,size_of_message(buf));
+                    }
+
                 }
             //}
         }
@@ -229,13 +251,13 @@ int main() {
 //    }
 
 
-//    iResult = shutdown(sockfd, 2);
-//    if (iResult == SOCKET_ERROR) {
-//        printf("shutdown failed: %d\n", WSAGetLastError());
-//        closesocket(sockfd);
-//        WSACleanup();
-//        return 1;
-//    }
+    int iResult = shutdown(sockfd, 2);
+    if (iResult == SOCKET_ERROR) {
+        printf("shutdown failed: %d\n", WSAGetLastError());
+        closesocket(sockfd);
+        WSACleanup();
+        return 1;
+    }
     cout<<"\nSsafe";
     return 0;
 }

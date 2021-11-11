@@ -1,2 +1,0 @@
-this is post message from client!
-thank you

@@ -1,1 +1,1 @@
-client-post /test/yoyo.jpg my_server 4000
+client-post /test/client_image_small.jpg my_server 4000

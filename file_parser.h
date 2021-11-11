@@ -13,10 +13,10 @@ vector<vector<string>>  parse_input_file(string path){
     //cout<<path<<"\n";
     vector<vector<string>> commands;
 
-    std::ifstream input( path , std::ios::binary );
+    std::ifstream input( path , std::ios::in );
     string str;
     while(getline(input,str)){
-//        cout<<str<<"\n";
+        cout<<str<<"\n";
         vector<string> line_inf;
         //method - filepath+file - hostname - port
         char * cstr = new char [str.length()+1];

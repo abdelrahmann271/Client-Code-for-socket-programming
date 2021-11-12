@@ -37,18 +37,16 @@ public:
         headers[header_name] = header_value;
     }
     void  add_body(string message){
-        body = message;
+        body += message;
     }
     string build(){
         string http = "";
         http+=method+" "+filename+" "+"HTTP/1.1\r\n";
         for (auto i = headers.begin(); i != headers.end(); i++){
-            //cout<<i->first<<": "<<i->second<<"\r\n";
             http+=i->first+": "+i->second+"\r\n";
         }
         http+="\r\n";
         http+=body;
-        //cout<<http<<" henaaa\n";
         return http;
     }
 
@@ -146,9 +144,8 @@ void parse_http(char *message ,
         headers[words[0]] = words[1];
     }
     int cnt = ( headers.find("Content-Length") == headers.end() )? 0 : stoi(headers["Content-Length"]);
-    //cout<<headers["Content-Length"]<<" content length\n";
     int y = 0;
-    while(y<cnt){
+    while(y<cnt && j <size_of_message){
         body+=message[j];
         j++;
         y++;

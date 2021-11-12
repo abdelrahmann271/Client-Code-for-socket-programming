@@ -59,7 +59,7 @@ int main() {
 
 
     //Executing commands..
-
+    cout<<commands.size()<<"\n";
     //For every command do the following ..
     for(int i = 0 ; i < commands.size() ; i++){
         cout<<"========================================================================================\n";
@@ -118,22 +118,64 @@ int main() {
 
             //Receive message
 
-            char buf[DEFAULT_BUFLEN]={0};
-            int bytesReceived = recv(sockfd, buf, DEFAULT_BUFLEN, 0);
-            cout<<bytesReceived;
+//            char buf[DEFAULT_BUFLEN]={0};
+//            int bytesReceived = recv(sockfd, buf, DEFAULT_BUFLEN, 0);
+//            cout<<bytesReceived;
+            char buffer[DEFAULT_BUFLEN];
+            int bReceived = -1;
+            HTTP recvieved;
+            unordered_map<string,string> headers;
+            string method;
+            string file_name;
+            string http_version;
+            string body = "";
+            string status="";
+            cout<<"==>"<<"Waiting on receive"<<"\n";
+            if ((bReceived = recv(sockfd,  buffer, DEFAULT_BUFLEN, MSG_PEEK)) > 0) {
+                cout<<"==>"<<"Size of buffer"<<"\n";
+                cout<<size_of_message(  buffer)<<"\n";;
+                string http_version;
+                parse_http(  buffer, headers,  http_version, status,body,bReceived);
+                //int totalBytes = size_of_message(  buffer);
+                int totalBytes = bReceived;
+                recv(sockfd, buffer, totalBytes, 0);
+                cout<<"==>"<<"Buffer Sent"<<"\n";
+                for(int i = 0 ; i < totalBytes ; i++){
+                    cout<<buffer[i];
+                }
+                int bodyLength = std::atoi(headers["Content-Length"].c_str());
+                cout<<"==>"<<"Content Length"<<"\n";
+                cout<<bodyLength<<"\n";
+                cout<<"==>"<<"Received"<<"\n";
+                cout<<body.size()<<"\n";
+                bodyLength-=body.size();
+                while (bodyLength > 0) {
+                    int read = recv(sockfd, buffer, std::min(DEFAULT_BUFLEN, bodyLength), 0);
+                    for (int i = 0; i < read; i++)
+                    {
+                        body +=  buffer[i];
+                    }
+                    bodyLength -= DEFAULT_BUFLEN;
+                }
+            }
+            else if(bReceived == 0){
+                int iResult = shutdown(sockfd, 2);
+                break;
+            }
 
-            if (bytesReceived > 0)
+
+            if (bReceived > 0)
             {
                 cout<<"==>"<<"The messgage"<<"\n";
-                for(int i = 0 ; i < bytesReceived ; i++){
-                    cout<<buf[i];
+                for(int i = 0 ; i < bReceived ; i++){
+                    cout<<buffer[i];
                 }
 
-                unordered_map<string,string> headers;
-                string http_version;
-                string body;
-                string status_code;
-                parse_http(buf, headers,http_version,status_code,body,size_of_message(buf));
+//                unordered_map<string,string> headers;
+//                string http_version;
+//                string body;
+//                string status_code;
+//                parse_http(buf, headers,http_version,status_code,body,size_of_message(buf));
 
                 ofstream MyFile;
                 string createFile = "/Users/Abdelrahman Nour/CLionProjects/client/" + file;
@@ -158,7 +200,7 @@ int main() {
             string file_to_post = "/Users/Abdelrahman Nour/CLionProjects/client/" + file_name; // From Command
             cout<<file_name<<"\n";
             //string file_to_post =  "yoyo.jpg"; // From Command
-            char buffer_of_file[DEFAULT_BUFLEN]; /// tooooooooooooooooooooooooooooo
+            //char buffer_of_file[DEFAULT_BUFLEN]; /// tooooooooooooooooooooooooooooo
             std::ifstream input;
             input.open(file_to_post,ios::in | ios::binary);
             if(!input){
@@ -166,6 +208,8 @@ int main() {
             }
             else{
                 HTTP request;
+                request.set_method("POST");
+                request.set_filename(file_name);
 
                 string body = "";
                 char ch;
@@ -182,35 +226,31 @@ int main() {
                         //create a new buffer
                     }
                 }
-                cout<<"size "<<body.size()<<"\n";
-                cout<<body;
-                request.set_method("POST");
-                request.set_filename(file_name);
                 request.add_header("Content-Length", to_string(size_of_file_to_send));
+                //cout<<to_string(size_of_file_to_send)<<"\n";
                 request.add_body(body);
                 string whole_request = request.build();
-//                char msg[DEFAULT_BUFLEN];
-                int i =0;
-//                cout<<"\n"<<whole_request.size()<<"\n";
-                for( ; i < whole_request.size(); i++){  // handle this
-                    buffer_of_file[i] = whole_request[i];
+                //cout<<whole_request.size()<<"\n";
+
+                int cnt = 0;
+                while(cnt<whole_request.size()){
+                    char buffer_of_file[DEFAULT_BUFLEN];
+                    int i =0;
+                    for( ; (i < DEFAULT_BUFLEN) && (cnt < whole_request.size() ); i++){  // handle this
+                        buffer_of_file[i] = whole_request[cnt];
+                        cnt++;
+                    }
+                    int iResult;
+                    iResult = send(sockfd, buffer_of_file, i, 0);
+                    if (iResult == SOCKET_ERROR) {
+                        printf("send failed: %d\n", WSAGetLastError());
+                        closesocket(sockfd);
+                        WSACleanup();
+                        return 1;
+                    }
+                    printf("Bytes Sent: %ld\n", iResult);
                 }
-//                int len, bytes_sent;
-//                len = strlen(msg);
-//                cout<<"\nlen"<<i<<"\n";
-//                int recvbuflen = DEFAULT_BUFLEN;
-//                char recvbuf[DEFAULT_BUFLEN];
-                int iResult;
-                // Send an initial buffer
-//                iResult = send(sockfd, msg, (int) strlen(msg), 0);
-                iResult = send(sockfd, buffer_of_file, i, 0);
-                if (iResult == SOCKET_ERROR) {
-                    printf("send failed: %d\n", WSAGetLastError());
-                    closesocket(sockfd);
-                    WSACleanup();
-                    return 1;
-                }
-                printf("Bytes Sent: %ld\n", iResult);
+
 
                 char buf[DEFAULT_BUFLEN]={0};
                 int bytesReceived = recv(sockfd, buf, DEFAULT_BUFLEN, 0);
@@ -225,9 +265,9 @@ int main() {
 //                    string body;
 //                    string status_code;
 //                    parse_http(buf, headers,http_version,status_code,body,size_of_message(buf));
-                    }
-
                 }
+
+            }
             //}
         }
         else{
@@ -258,6 +298,6 @@ int main() {
         WSACleanup();
         return 1;
     }
-    cout<<"\nSsafe";
+    cout<<"\nSafe";
     return 0;
 }

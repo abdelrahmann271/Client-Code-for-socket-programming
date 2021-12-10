@@ -10,15 +10,16 @@
 using std::ofstream;
 using namespace std;
 
-#define DEST_PORT 4000
+//#define DEST_PORT 4000
 #define DEST_IP "127.0.0.1"
 #define DEFAULT_BUFLEN 9000
 
 //cout<<"==>"<<<<"\n";
-
-int main() {
+int DEST_PORT;
+int main(int argc, char **argv) {
 
     //Initialization
+    DEST_PORT = atoi(argv[1]);
 
     WSAData wsaData;
     if (WSAStartup(MAKEWORD(1, 1), &wsaData) != 0) {
@@ -87,19 +88,19 @@ int main() {
             }
             string path = file_name.substr(0, lstInd);
             string file = file_name.substr(lstInd + 1, file_name.size() - lstInd);
-            cout << path << " " << file;
+//            cout << path << " " << file;
 
 
             char msg[DEFAULT_BUFLEN];
             int i =0;
-            cout<<"\n"<<whole_request.size()<<"\n";
+//            cout<<"\n"<<whole_request.size()<<"\n";
             for( ; i < whole_request.size(); i++){  // handle this
                 msg[i] = whole_request[i];
             }
 
             int len, bytes_sent;
             len = strlen(msg);
-            cout<<"len"<<i<<"\n";
+//            cout<<"len"<<i<<"\n";
             int recvbuflen = DEFAULT_BUFLEN;
             char recvbuf[DEFAULT_BUFLEN];
 
@@ -170,7 +171,7 @@ int main() {
                 for(int i = 0 ; i < bReceived ; i++){
                     cout<<buffer[i];
                 }
-
+                cout<<"\n";
 //                unordered_map<string,string> headers;
 //                string http_version;
 //                string body;
@@ -180,14 +181,14 @@ int main() {
                 ofstream MyFile;
                 string createFile = "/Users/Abdelrahman Nour/CLionProjects/client/" + file;
 
-                cout<<"\n"<<createFile<<"\n";
+//                cout<<"\n"<<createFile<<"\n";
                 MyFile.open(createFile.c_str(), std::ofstream::binary | std::ofstream::out);
                 if(!MyFile){
                     cout<<"error file\n";
                     //Create the file..
                 }
                 else{
-                    cout<<body.size();
+//                    cout<<body.size();
                     MyFile << body;
                     // Close the file
                     MyFile.close();
@@ -198,7 +199,7 @@ int main() {
         else if(method == "client-post"){
 
             string file_to_post = "/Users/Abdelrahman Nour/CLionProjects/client/" + file_name; // From Command
-            cout<<file_name<<"\n";
+//            cout<<file_name<<"\n";
             //string file_to_post =  "yoyo.jpg"; // From Command
             //char buffer_of_file[DEFAULT_BUFLEN]; /// tooooooooooooooooooooooooooooo
             std::ifstream input;
@@ -260,6 +261,7 @@ int main() {
                     for(int i = 0 ; i < bytesReceived ; i++){
                         cout<<buf[i];
                     }
+                    cout<<"\n";
 //                    unordered_map<string,string> headers;
 //                    string http_version;
 //                    string body;
